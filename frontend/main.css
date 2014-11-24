@@ -1,0 +1,16 @@
+h3, h4 {
+	text-align: center;
+}
+
+.row > form > button, input, select {
+	margin: 10px 0;
+}
+
+form label {
+	margin: 0 10px;
+}
+
+table {
+	table-layout: fixed;
+	width: 1200px;
+}

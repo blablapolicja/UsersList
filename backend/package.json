@@ -1,0 +1,10 @@
+{
+  "name": "userlist-rest-api",
+  "version": "0.0.2",
+  "private": true,
+  "dependencies": {
+    "body-parser": "^1.9.3",
+    "express": "^4.10.2",
+    "mysql": "^2.5.3"
+  }
+}
