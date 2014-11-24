@@ -1,3 +1,7 @@
 UsersList
 =========
-UsersList with endless scroll
+UsersList:
+
+sorting, filtering
+input fields with autocomplete
+you can edit user
