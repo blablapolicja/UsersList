@@ -22,7 +22,7 @@ app.all('*', function(req, res, next) {
   next();
 });
 
-app.get('/api/users', getUsers);
+app.get('/api/users/:id1', getUsers);
 app.put('/api/userEdit/:id', editUser);
 
 function getUsers (req,res) {
@@ -35,7 +35,9 @@ function getUsers (req,res) {
                 err:    err.code
             });
         } else {
-			connection.query('SELECT * FROM UserList', function(err,rows){
+            var id1 = req.params.id1;
+                id2 = parseInt(id1) + 9;
+			connection.query('SELECT * FROM UserList WHERE Id BETWEEN ? AND ?', [id1,id2], function(err,rows){
 				if (err) {
                     console.error(err);
                     res.statusCode = 500;

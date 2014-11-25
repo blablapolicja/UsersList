@@ -10,7 +10,7 @@
 	<link rel="stylesheet" type="text/css" href="main.css">
 </head>
 <body ng-controller="mainController" ng-init="checkAll()">
-	<div class="container-fluid">
+	<div class="container-fluid scroller" scroller loading-method="loadMore()">
 		<div class="row">
 			<div class="col-md-12">
 				<h3>Users</h3>
@@ -53,13 +53,16 @@
 							<td>{{user.Email}}</td>
 							<td>{{user.Age}}</td>
 							<td>{{user.Gender}}</td>
-							<td><button class="btn btn-default" ng-click="openModal(user,'sm')">Edit</button></td>
+							<td>
+								<button class="btn btn-default" ng-click="openModal(user,'sm')">Edit</button>
+							</td>
 						</tr>
 					</tbody>
 				</table>
 			</div>
 		</div>
 	</div>
+	<pager total-items="totalItems" ng-model="currentPage" items-per-page="10" ng-click="pageChanged()"></pager>
 </body>
 <script type="text/ng-template" id="myModalContent.html">
 	<form role="form">

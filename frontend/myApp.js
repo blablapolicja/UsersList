@@ -1,5 +1,22 @@
 angular.module('myApp', ['ui.bootstrap'])
 
+	.directive('scroller', function(){
+		return {
+	        restrict: 'A',
+	        scope: {
+	            loadingMethod: "&"
+	        },
+	        link: function (scope, elem, attrs) {
+	            rawElement = elem[0];
+	            elem.bind('scroll', function () {
+	                if((rawElement.scrollTop + rawElement.offsetHeight+5) >= rawElement.scrollHeight){
+	                    scope.$apply(scope.loadingMethod);
+	                }
+	            });
+	        }
+	    };
+	})
+
 	.filter('ageFilter', function(){
 		'use strict';
 		return function(userList, value){
@@ -35,8 +52,8 @@ angular.module('myApp', ['ui.bootstrap'])
 
 	.factory('services', function($http){
 		return {
-			allUsers: function(){
-				return $http({ method: 'GET', url: '/api/users' });
+			allUsers: function(start){
+				return $http.get('/api/users/' + start);
 			},
 			updateUser: function(user, firstName, lastName, email, age, gender){
 				return $http.put('/api/userEdit/' + user.Id, {Firstname: firstName, LastName: lastName, Email: email, Age: age, Gender: gender});
@@ -47,16 +64,22 @@ angular.module('myApp', ['ui.bootstrap'])
 	.controller('mainController', function ($scope, services, $modal) {
 		'use strict';
 		$scope.Users = {};
-		$scope.getAllUsers = function(){
-			services.allUsers()
-				.success(function (data) {
-                    $scope.Users = data;
-                })
-                .error(function (data, status, headers, config) {
-                    throw error;
-                });
+
+		$scope.loadMore = function(start){			
+			if (start === undefined) {
+				start = $scope.Users.length + 1;
+				services.allUsers(start).success(function (data) {
+	                angular.forEach(data, function(user){
+                		$scope.Users.push(user);
+	                });
+	            });
+			} else {
+				services.allUsers(start).success(function (data) {
+	                $scope.Users = data;
+	            });
+			}
 		};
-		$scope.getAllUsers();
+		$scope.loadMore(0);
 
 		$scope.openModal = function(user, size){
 			var modalInstance = $modal.open({
@@ -73,8 +96,8 @@ angular.module('myApp', ['ui.bootstrap'])
 	})
 
 	.controller('ModalInstanceCtrl', function($scope, $modalInstance, user, services){
+		'use strict';
 		$scope.user = user;
-
 		$scope.submit = function(user) {
 			services.updateUser($scope.user, $scope.user.FirstName, $scope.user.LastName, $scope.user.Email, $scope.user.Age, $scope.user.Gender);
 			$modalInstance.close();
