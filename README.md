@@ -3,6 +3,7 @@ UsersList
 UsersList:
 - sorting & filtering,
 - input fields with autocomplete,
+- endless scroll,
 - you can edit user.
 
 In backend:
