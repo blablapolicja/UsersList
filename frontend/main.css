@@ -20,3 +20,9 @@ table {
 	table-layout: fixed;
 	width: 1200px;
 }
+
+.navs {
+	margin-left: 45%;
+	position: absolute;
+	bottom: 25px;
+}

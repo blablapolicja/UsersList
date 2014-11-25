@@ -1,4 +1,4 @@
-angular.module('myApp', ['ui.bootstrap'])
+angular.module('myApp', ['ui.bootstrap','xeditable'])
 
 	.directive('scroller', function(){
 		return {
@@ -9,7 +9,7 @@ angular.module('myApp', ['ui.bootstrap'])
 	        link: function (scope, elem, attrs) {
 	            rawElement = elem[0];
 	            elem.bind('scroll', function () {
-	                if((rawElement.scrollTop + rawElement.offsetHeight+5) >= rawElement.scrollHeight){
+	                if((rawElement.scrollTop + rawElement.offsetHeight) >= rawElement.scrollHeight){
 	                    scope.$apply(scope.loadingMethod);
 	                }
 	            });
@@ -61,25 +61,61 @@ angular.module('myApp', ['ui.bootstrap'])
 		};
 	})
 
-	.controller('mainController', function ($scope, services, $modal) {
-		'use strict';
-		$scope.Users = {};
+	.run(function(editableOptions) {
+		editableOptions.theme = 'bs3';
+	})
 
-		$scope.loadMore = function(start){			
-			if (start === undefined) {
-				start = $scope.Users.length + 1;
-				services.allUsers(start).success(function (data) {
-	                angular.forEach(data, function(user){
-                		$scope.Users.push(user);
-	                });
-	            });
+	.controller('mainController', function ($scope, services, $modal, $anchorScroll, $location) {
+		'use strict';
+		$scope.Users = [];
+		$scope.genders = ["Male", "Female"];
+		$scope.currentPage = 0;
+		$scope.pages = 11;
+
+		$scope.nextPage = function(){
+			var anchor 	= parseInt($scope.currentPage - 1 + "0"),
+				start	= $scope.Users.length + 1;
+			$scope.loadMore(start, anchor);
+		};
+
+		$scope.prevPage = function(){
+			$scope.currentPage--;
+			var anchor;
+			if ($scope.currentPage == 2) {
+				anchor = "top";
 			} else {
-				services.allUsers(start).success(function (data) {
-	                $scope.Users = data;
-	            });
+				anchor = parseInt($scope.currentPage - 1 + "0");
+			}
+			$scope.gotoAnchor(anchor);
+		};
+
+		$scope.gotoAnchor = function(x) {
+			$location.hash('anchor' + x);
+	        $anchorScroll();
+		};
+
+		$scope.loadMore = function(start, anchor){			
+			services.allUsers(start).success(function (data) {
+                angular.forEach(data, function(user){
+                	if ($scope.Users[$scope.Users.length] != user) {
+	            		$scope.Users.push(user);
+            		}
+                });
+                if (anchor) {
+                	$scope.gotoAnchor(anchor);
+                }
+            });
+			if ($scope.currentPage < $scope.pages) {
+				$scope.currentPage++;
 			}
 		};
-		$scope.loadMore(0);
+		$scope.loadMore(1);
+
+		$scope.submit = function(user, id){
+			angular.extend(user, {Id: id});
+			console.log(user);
+			services.updateUser(user, user.FirstName, user.LastName, user.Email, user.Age, user.Gender);
+		};
 
 		$scope.openModal = function(user, size){
 			var modalInstance = $modal.open({
